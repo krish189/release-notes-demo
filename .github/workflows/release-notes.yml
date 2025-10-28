@@ -1,0 +1,28 @@
+name: Generate Release Notes
+on:
+  pull_request:
+    types: [closed]
+jobs:
+  generate-notes:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Dependencies
+        run: npm install @octokit/rest
+      - name: Run release notes generation script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: node script/generateReleaseNotes.js
+      - name: Upload release notes as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-notes
+          path: release-notes.md
