@@ -23,6 +23,13 @@ async function generateReleaseNotes() {
       repo,
       pull_number: pr.number,
     });
+
+    // Fetch changed files associated with the PR
+    const files = await octokit.pulls.listFiles({
+      owner,
+      repo,
+      pull_number: pr.number,
+    });
     
     console.log(pr)
 
@@ -30,13 +37,27 @@ async function generateReleaseNotes() {
     // # - Heading Level 1, ## - Heading Level 2, ** - Bold, * - Italic
     const notes = `
     ## Release Notes
+    **PR Number:** #${pr.number}
     **PR Title:** ${pr.title}
     **Description:** ${pr.body || 'No description provided'}
-    **Merged By:** ${pr.merged_by.login}
     **Author:** ${pr.user.login}
+    **Merged By:** ${pr.merged_by.login}
+    **Merged At:** ${pr.merged_at}
+    **Base Branch:** ${pr.base.ref}
+    **Head Branch:** ${pr.head.ref}
     **Labels:** ${(pr.labels || []).map(label => label.name).join(', ') || 'None'}
-    **Commits:**
+    **Milestone:** ${pr.milestone ? pr.milestone.title : 'None'}
+    **Merge Commit SHA**: ${pr.merge_commit_sha}
+    
+    ### Commits:
     ${commits.data.map(c => `- ${c.commit.message}`).join('\n')}
+    
+    ### Files Changed:
+    ${files.data.map(f => `- ${f.filename}`).join('\n')}
+
+    **Summary:**
+    - Total Commits: ${commits.data.length}
+    - Total Files Changed: ${files.data.length}
     `;
 
     // Write to a markdown file
