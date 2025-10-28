@@ -1,6 +1,8 @@
 name: Generate Release Notes
 on:
   pull_request:
+    branches:
+      - master
     types: [closed]
 jobs:
   generate-notes:
