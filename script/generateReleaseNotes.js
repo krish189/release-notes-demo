@@ -23,6 +23,8 @@ async function generateReleaseNotes() {
       repo,
       pull_number: pr.number,
     });
+    
+    console.log(pr)
 
     // Build release notes content
     // # - Heading Level 1, ## - Heading Level 2, ** - Bold, * - Italic
