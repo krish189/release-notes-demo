@@ -31,8 +31,6 @@ async function generateReleaseNotes() {
       pull_number: pr.number,
     });
     
-    console.log(pr)
-
     // Build release notes content
     // # - Heading Level 1, ## - Heading Level 2, ** - Bold, * - Italic
     const notes = `
@@ -63,6 +61,24 @@ async function generateReleaseNotes() {
     // Write to a markdown file
     fs.writeFileSync('release-notes.md', notes);
     console.log('Release notes generated successfully!');
+
+    // Display Release Note Details in Releases Section of GitHub Homepage
+    const prTitle = pr.title;
+    const tagName = prTitle.split(' ')[1];
+    const tag = prTitle.includes('Release') ? tagName : `v${new Date().toISOString().split(".")[0].replaceAll("-","").replaceAll(":","").replace("T","")}`; 
+    
+    // Posting data for creating new release
+    await octokit.repos.createRelease({
+      owner,
+      repo,
+      tag_name: tag,
+      name: `Release ${tag}`,
+      body: pr.body,
+      draft: false,
+      prerelease: false,
+    });
+
+    console.log("Release Details added to Releases Section in GitHub Homepage successfully");
   } catch (error) {
     console.error('Error generating release notes:', error);
     process.exit(1);
