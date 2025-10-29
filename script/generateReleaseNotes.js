@@ -32,7 +32,6 @@ async function generateReleaseNotes() {
     });
     
     // Build release notes content
-    // # - Heading Level 1, ## - Heading Level 2, ** - Bold, * - Italic
     const notes = `
     ## Release Notes
     **PR Number:** #${pr.number}
@@ -67,7 +66,7 @@ async function generateReleaseNotes() {
     const tagName = prTitle.split(' ')[1];
     const tag = prTitle.includes('Release') ? tagName : `v${new Date().toISOString().split(".")[0].replaceAll("-","").replaceAll(":","").replace("T","")}`; 
     
-    // Posting data for creating new release
+    // POST to GitHub API to create a new release using the specified tag and PR body
     await octokit.repos.createRelease({
       owner,
       repo,
